@@ -6,8 +6,6 @@
     <meta name="theme-color" content="#6ab04c">
     <meta name="description" content="Juego TrHero - Divertido juego de plataformas">
     <title>TrHero - Pantalla Completa</title>
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" href="assets/logo.png" type="image/png">
     <style>
         * {
             margin: 0;
@@ -270,10 +268,11 @@
         let sticks = [];
         let trees = [];
         let score = 0;
+        let justRestarted = false; // Bandera para controlar reinicios
 
         // Cargar imagen del jugador
         let playerImage = new Image();
-        playerImage.src = 'assets/player.png'; // Ruta a la imagen del jugador
+        playerImage.src = 'https://placehold.co/80x100/3498db/white?text=Player'; // Ruta a la imagen del jugador
         playerImage.onload = function() {
             // Una vez cargada la imagen, inicializar el juego
             initGame();
@@ -352,7 +351,7 @@
                 installButton.addEventListener('click', (e) => {
                     installButton.style.display = 'none';
                     deferredPrompt.prompt();
-                    deferredPrompt.userChoice.then((choiceResult) => {
+                    deferredPrompt.userChoice.then((choiceResult) {
                         if (choiceResult.outcome === 'accepted') {
                             console.log('User accepted the install prompt');
                         } else {
@@ -385,6 +384,7 @@
             lastTimestamp = undefined;
             sceneOffset = 0;
             score = 0;
+            justRestarted = true; // Marcamos que acabamos de reiniciar
 
             introductionElement.style.opacity = 1;
             perfectElement.style.opacity = 0;
@@ -406,6 +406,9 @@
             heroY = 0;
 
             draw();
+            
+            // Desactivamos la bandera después de un breve tiempo
+            setTimeout(() => { justRestarted = false; }, 300);
         }
 
         // Generar árboles
@@ -454,7 +457,7 @@
 
         // Iniciar estiramiento al hacer clic
         window.addEventListener("mousedown", function (event) {
-            if (phase == "waiting") {
+            if (phase == "waiting" && !justRestarted) {
                 lastTimestamp = undefined;
                 introductionElement.style.opacity = 0;
                 phase = "stretching";
@@ -473,7 +476,7 @@
 
         // También soporte para dispositivos táctiles
         window.addEventListener("touchstart", function (event) {
-            if (phase == "waiting") {
+            if (phase == "waiting" && !justRestarted) {
                 lastTimestamp = undefined;
                 introductionElement.style.opacity = 0;
                 phase = "stretching";
@@ -504,16 +507,14 @@
 
         // Botón de reinicio para dispositivos táctiles
         restartButton.addEventListener("touchstart", function (event) {
-            event.preventDefault();
+            event.stopPropagation(); // Evita que el evento se propague
             resetGame();
-            restartButton.style.display = "none";
         }, { passive: false });
 
         // Botón de reinicio para ratón
         restartButton.addEventListener("click", function (event) {
-            event.preventDefault();
+            event.stopPropagation(); // Evita que el evento se propague
             resetGame();
-            restartButton.style.display = "none";
         });
 
         // Iniciar bucle de animación
