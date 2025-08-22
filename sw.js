@@ -1,0 +1,44 @@
+const CACHE_NAME = 'trhero-v1';
+const urlsToCache = [
+  '/',
+  '/index.html',
+  'assets/player.png',
+  'assets/logo.png'
+];
+
+// Instalar el Service Worker
+self.addEventListener('install', function(event) {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(function(cache) {
+        return cache.addAll(urlsToCache);
+      })
+  );
+});
+
+// Activar el Service Worker
+self.addEventListener('activate', function(event) {
+  event.waitUntil(
+    caches.keys().then(function(cacheNames) {
+      return Promise.all(
+        cacheNames.map(function(cacheName) {
+          if (cacheName !== CACHE_NAME) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+});
+
+// Fetch events
+self.addEventListener('fetch', function(event) {
+  event.respondWith(
+    caches.match(event.request)
+      .then(function(response) {
+        // Devuelve la respuesta en cache o haz una petición normal
+        return response || fetch(event.request);
+      }
+    )
+  );
+});

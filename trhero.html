@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#6ab04c">
+    <meta name="description" content="Juego TrHero - Divertido juego de plataformas">
+    <title>TrHero - Pantalla Completa</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="assets/logo.png" type="image/png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            touch-action: manipulation;
+        }
+        
+        body {
+            background: linear-gradient(to bottom, #6ab04c, #badc58);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        #game-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        #game {
+            width: 100%;
+            height: 100%;
+            display: block;
+            background: linear-gradient(to bottom, #BBD691, #FEF1E1);
+        }
+        
+        #score {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            font-size: 32px;
+            font-weight: bold;
+            color: #2c3e50;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 25px;
+            border-radius: 30px;
+            z-index: 10;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        #introduction {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 400px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 22px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            transition: opacity 1s;
+            z-index: 10;
+        }
+        
+        #perfect {
+            position: fixed;
+            top: 30%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 32px;
+            font-weight: bold;
+            color: #e74c3c;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 30px;
+            border-radius: 20px;
+            opacity: 0;
+            transition: opacity 1s;
+            z-index: 10;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        #restart {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px 40px;
+            border: none;
+            border-radius: 40px;
+            background: linear-gradient(to right, #e74c3c, #c0392b);
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            display: none;
+            z-index: 10;
+            transition: all 0.3s;
+            -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+        }
+        
+        #restart:active {
+            transform: translate(-50%, -50%) scale(0.95);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .controls {
+            position: fixed;
+            bottom: 30px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            color: #2c3e50;
+            font-size: 18px;
+            font-weight: 600;
+            text-shadow: 1px 1px 3px rgba(255, 255, 255, 0.8);
+        }
+        
+        .logo {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            font-size: 36px;
+            font-weight: bold;
+            color: #2c3e50;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            #score {
+                font-size: 28px;
+                padding: 8px 20px;
+            }
+            
+            #introduction {
+                font-size: 20px;
+                padding: 20px;
+            }
+            
+            #perfect {
+                font-size: 28px;
+                padding: 12px 25px;
+            }
+            
+            #restart {
+                padding: 18px 35px;
+                font-size: 22px;
+            }
+            
+            .logo {
+                font-size: 32px;
+            }
+            
+            .controls {
+                font-size: 16px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            #score {
+                font-size: 24px;
+                top: 15px;
+                right: 15px;
+                padding: 6px 15px;
+            }
+            
+            .logo {
+                font-size: 28px;
+                top: 15px;
+                left: 15px;
+            }
+            
+            .controls {
+                font-size: 14px;
+                bottom: 20px;
+            }
+            
+            #introduction {
+                font-size: 18px;
+                width: 90%;
+            }
+        }
+        
+        /* Modo portrait para móviles */
+        @media (max-height: 600px) {
+            .controls {
+                display: none;
+            }
+            
+            #introduction {
+                top: 40%;
+                font-size: 18px;
+            }
+        }
+
+        /* Indicador de instalación */
+        .install-button {
+            position: fixed;
+            bottom: 30px;
+            right: 20px;
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 10px;
+            color: #2c3e50;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div class="logo">TrHero</div>
+        <div id="score">0</div>
+        <canvas id="game"></canvas>
+        <div id="introduction">Mantén presionado para estirar el palo</div>
+        <div id="perfect">PUNTUACIÓN DOBLE</div>
+        <button id="restart">REINICIAR</button>
+        <div class="controls">Haz clic o toca la pantalla para jugar</div>
+        <button class="install-button" id="installButton">Instalar App</button>
+    </div>
+
+    <script>
+        // Extensión del prototipo Array para obtener el último elemento
+        Array.prototype.last = function () {
+            return this[this.length - 1];
+        };
+
+        // Función seno que acepta grados en lugar de radianes
+        Math.sinus = function (degree) {
+            return Math.sin((degree / 180) * Math.PI);
+        };
+
+        // Variables para el tamaño del canvas
+        let canvasWidth, canvasHeight;
+
+        // Datos del juego
+        let phase = "waiting"; // waiting | stretching | turning | walking | transitioning | falling
+        let lastTimestamp;
+        let heroX;
+        let heroY;
+        let sceneOffset;
+        let platforms = [];
+        let sticks = [];
+        let trees = [];
+        let score = 0;
+
+        // Cargar imagen del jugador
+        let playerImage = new Image();
+        playerImage.src = 'assets/player.png'; // Ruta a la imagen del jugador
+        playerImage.onload = function() {
+            // Una vez cargada la imagen, inicializar el juego
+            initGame();
+        };
+
+        // Configuración
+        const platformHeight = 100;
+        const heroDistanceFromEdge = 10;
+        const paddingX = 100;
+        const perfectAreaSize = 10;
+        const backgroundSpeedMultiplier = 0.2;
+
+        // Colinas
+        const hill1BaseHeight = 100;
+        const hill1Amplitude = 10;
+        const hill1Stretch = 1;
+        const hill2BaseHeight = 70;
+        const hill2Amplitude = 20;
+        const hill2Stretch = 0.5;
+
+        // Velocidades
+        const stretchingSpeed = 4;
+        const turningSpeed = 4;
+        const walkingSpeed = 4;
+        const transitioningSpeed = 2;
+        const fallingSpeed = 2;
+
+        // Tamaño del héroe (más estilizado - 80x100)
+        const heroWidth = 80;
+        const heroHeight = 100;
+
+        // Obtener elementos del DOM
+        const canvas = document.getElementById("game");
+        const ctx = canvas.getContext("2d");
+        const introductionElement = document.getElementById("introduction");
+        const perfectElement = document.getElementById("perfect");
+        const restartButton = document.getElementById("restart");
+        const scoreElement = document.getElementById("score");
+        const gameContainer = document.getElementById("game-container");
+        const installButton = document.getElementById("installButton");
+
+        // Inicializar el juego después de cargar la imagen
+        function initGame() {
+            resizeGame(); // Ajustar el tamaño inicial
+            resetGame(); // Iniciar el juego
+            
+            // Configurar el evento de redimensionamiento
+            window.addEventListener("resize", resizeGame);
+            
+            // Configurar PWA
+            setupPWA();
+        }
+
+        // Configurar funcionalidad PWA
+        function setupPWA() {
+            // Detectar si el navegador soporta Service Worker
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                    navigator.serviceWorker.register('sw.js')
+                    .then(function(registration) {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    })
+                    .catch(function(error) {
+                        console.log('ServiceWorker registration failed: ', error);
+                    });
+                });
+            }
+
+            // Detectar si la app se puede instalar
+            let deferredPrompt;
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                installButton.style.display = 'block';
+                
+                installButton.addEventListener('click', (e) => {
+                    installButton.style.display = 'none';
+                    deferredPrompt.prompt();
+                    deferredPrompt.userChoice.then((choiceResult) => {
+                        if (choiceResult.outcome === 'accepted') {
+                            console.log('User accepted the install prompt');
+                        } else {
+                            console.log('User dismissed the install prompt');
+                        }
+                        deferredPrompt = null;
+                    });
+                });
+            });
+        }
+
+        // Ajustar el tamaño del juego según la pantalla
+        function resizeGame() {
+            canvasWidth = window.innerWidth;
+            canvasHeight = window.innerHeight;
+            
+            // Aplicar dimensiones al canvas
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+            
+            // Redibujar el juego
+            if (phase !== "waiting") {
+                draw();
+            }
+        }
+
+        // Reiniciar variables del juego
+        function resetGame() {
+            phase = "waiting";
+            lastTimestamp = undefined;
+            sceneOffset = 0;
+            score = 0;
+
+            introductionElement.style.opacity = 1;
+            perfectElement.style.opacity = 0;
+            restartButton.style.display = "none";
+            scoreElement.innerText = score;
+
+            platforms = [{ x: 50, w: 50 }];
+            generatePlatform();
+            generatePlatform();
+            generatePlatform();
+            generatePlatform();
+
+            sticks = [{ x: platforms[0].x + platforms[0].w, length: 0, rotation: 0 }];
+
+            trees = [];
+            for (let i = 0; i < 10; i++) generateTree();
+
+            heroX = platforms[0].x + platforms[0].w - heroDistanceFromEdge;
+            heroY = 0;
+
+            draw();
+        }
+
+        // Generar árboles
+        function generateTree() {
+            const minimumGap = 30;
+            const maximumGap = 150;
+            const lastTree = trees[trees.length - 1];
+            let furthestX = lastTree ? lastTree.x : 0;
+
+            const x = furthestX + minimumGap + Math.floor(Math.random() * (maximumGap - minimumGap));
+            const treeColors = ["#6D8821", "#8FAC34", "#98B333"];
+            const color = treeColors[Math.floor(Math.random() * 3)];
+
+            trees.push({ x, color });
+        }
+
+        // Generar plataformas
+        function generatePlatform() {
+            const minimumGap = 40;
+            const maximumGap = 200;
+            const minimumWidth = 20;
+            const maximumWidth = 100;
+
+            const lastPlatform = platforms[platforms.length - 1];
+            let furthestX = lastPlatform.x + lastPlatform.w;
+
+            const x = furthestX + minimumGap + Math.floor(Math.random() * (maximumGap - minimumGap));
+            const w = minimumWidth + Math.floor(Math.random() * (maximumWidth - minimumWidth));
+
+            platforms.push({ x, w });
+        }
+
+        // Reiniciar el juego con la barra espaciadora
+        window.addEventListener("keydown", function (event) {
+            if (event.key == " ") {
+                event.preventDefault();
+                resetGame();
+                return;
+            }
+        });
+
+        // Prevenir el menú contextual en dispositivos táctiles
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+
+        // Iniciar estiramiento al hacer clic
+        window.addEventListener("mousedown", function (event) {
+            if (phase == "waiting") {
+                lastTimestamp = undefined;
+                introductionElement.style.opacity = 0;
+                phase = "stretching";
+                window.requestAnimationFrame(animate);
+            }
+            event.preventDefault();
+        });
+
+        // Terminar estiramiento al soltar
+        window.addEventListener("mouseup", function (event) {
+            if (phase == "stretching") {
+                phase = "turning";
+            }
+            event.preventDefault();
+        });
+
+        // También soporte para dispositivos táctiles
+        window.addEventListener("touchstart", function (event) {
+            if (phase == "waiting") {
+                lastTimestamp = undefined;
+                introductionElement.style.opacity = 0;
+                phase = "stretching";
+                window.requestAnimationFrame(animate);
+            }
+            event.preventDefault();
+        }, { passive: false });
+
+        window.addEventListener("touchend", function (event) {
+            if (phase == "stretching") {
+                phase = "turning";
+            }
+            event.preventDefault();
+        }, { passive: false });
+
+        // Prevenir zoom en dispositivos táctiles
+        document.addEventListener('gesturestart', function (e) {
+            e.preventDefault();
+        });
+
+        document.addEventListener('gesturechange', function (e) {
+            e.preventDefault();
+        });
+
+        document.addEventListener('gestureend', function (e) {
+            e.preventDefault();
+        });
+
+        // Botón de reinicio para dispositivos táctiles
+        restartButton.addEventListener("touchstart", function (event) {
+            event.preventDefault();
+            resetGame();
+            restartButton.style.display = "none";
+        }, { passive: false });
+
+        // Botón de reinicio para ratón
+        restartButton.addEventListener("click", function (event) {
+            event.preventDefault();
+            resetGame();
+            restartButton.style.display = "none";
+        });
+
+        // Iniciar bucle de animación
+        window.requestAnimationFrame(animate);
+
+        // Bucle principal del juego
+        function animate(timestamp) {
+            if (!lastTimestamp) {
+                lastTimestamp = timestamp;
+                window.requestAnimationFrame(animate);
+                return;
+            }
+
+            switch (phase) {
+                case "waiting":
+                    return;
+                case "stretching": {
+                    sticks.last().length += (timestamp - lastTimestamp) / stretchingSpeed;
+                    break;
+                }
+                case "turning": {
+                    sticks.last().rotation += (timestamp - lastTimestamp) / turningSpeed;
+
+                    if (sticks.last().rotation > 90) {
+                        sticks.last().rotation = 90;
+
+                        const [nextPlatform, perfectHit] = thePlatformTheStickHits();
+                        if (nextPlatform) {
+                            score += perfectHit ? 2 : 1;
+                            scoreElement.innerText = score;
+
+                            if (perfectHit) {
+                                perfectElement.style.opacity = 1;
+                                setTimeout(() => (perfectElement.style.opacity = 0), 1000);
+                            }
+
+                            generatePlatform();
+                            generateTree();
+                            generateTree();
+                        }
+
+                        phase = "walking";
+                    }
+                    break;
+                }
+                case "walking": {
+                    heroX += (timestamp - lastTimestamp) / walkingSpeed;
+
+                    const [nextPlatform] = thePlatformTheStickHits();
+                    if (nextPlatform) {
+                        const maxHeroX = nextPlatform.x + nextPlatform.w - heroDistanceFromEdge;
+                        if (heroX > maxHeroX) {
+                            heroX = maxHeroX;
+                            phase = "transitioning";
+                        }
+                    } else {
+                        const maxHeroX = sticks.last().x + sticks.last().length + heroWidth;
+                        if (heroX > maxHeroX) {
+                            heroX = maxHeroX;
+                            phase = "falling";
+                        }
+                    }
+                    break;
+                }
+                case "transitioning": {
+                    sceneOffset += (timestamp - lastTimestamp) / transitioningSpeed;
+
+                    const [nextPlatform] = thePlatformTheStickHits();
+                    if (sceneOffset > nextPlatform.x + nextPlatform.w - paddingX) {
+                        sticks.push({
+                            x: nextPlatform.x + nextPlatform.w,
+                            length: 0,
+                            rotation: 0
+                        });
+                        phase = "waiting";
+                    }
+                    break;
+                }
+                case "falling": {
+                    if (sticks.last().rotation < 180)
+                        sticks.last().rotation += (timestamp - lastTimestamp) / turningSpeed;
+
+                    heroY += (timestamp - lastTimestamp) / fallingSpeed;
+                    const maxHeroY = platformHeight + 100;
+                    if (heroY > maxHeroY) {
+                        restartButton.style.display = "block";
+                        return;
+                    }
+                    break;
+                }
+                default:
+                    throw Error("Wrong phase");
+            }
+
+            draw();
+            window.requestAnimationFrame(animate);
+
+            lastTimestamp = timestamp;
+        }
+
+        // Determinar si el palo golpea una plataforma
+        function thePlatformTheStickHits() {
+            if (sticks.last().rotation != 90)
+                throw Error(`Stick is ${sticks.last().rotation}°`);
+            const stickFarX = sticks.last().x + sticks.last().length;
+
+            const platformTheStickHits = platforms.find(
+                (platform) => platform.x < stickFarX && stickFarX < platform.x + platform.w
+            );
+
+            if (
+                platformTheStickHits &&
+                platformTheStickHits.x + platformTheStickHits.w / 2 - perfectAreaSize / 2 < stickFarX &&
+                stickFarX < platformTheStickHits.x + platformTheStickHits.w / 2 + perfectAreaSize / 2
+            )
+                return [platformTheStickHits, true];
+
+            return [platformTheStickHits, false];
+        }
+
+        // Dibujar el juego
+        function draw() {
+            ctx.save();
+            ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+
+            drawBackground();
+
+            // Centrar el área principal del canvas
+            ctx.translate(
+                (canvasWidth - canvasWidth) / 2 - sceneOffset,
+                (canvasHeight - canvasHeight) / 2
+            );
+
+            // Dibujar elementos
+            drawPlatforms();
+            drawSticks();
+            drawHero();
+
+            ctx.restore();
+        }
+
+        // Dibujar plataformas
+        function drawPlatforms() {
+            platforms.forEach(({ x, w }) => {
+                // Dibujar plataforma
+                ctx.fillStyle = "#795548";
+                ctx.fillRect(
+                    x,
+                    canvasHeight - platformHeight,
+                    w,
+                    platformHeight
+                );
+
+                // Dibujar área perfecta si el héroe no ha llegado aún
+                if (sticks.last().x < x) {
+                    ctx.fillStyle = "#E57373";
+                    ctx.fillRect(
+                        x + w / 2 - perfectAreaSize / 2,
+                        canvasHeight - platformHeight,
+                        perfectAreaSize,
+                        perfectAreaSize
+                    );
+                }
+
+                // Dibujar bordes de la plataforma
+                ctx.strokeStyle = "#5D4037";
+                ctx.lineWidth = 2;
+                ctx.strokeRect(
+                    x,
+                    canvasHeight - platformHeight,
+                    w,
+                    platformHeight
+                );
+            });
+        }
+
+        // Dibujar al héroe
+        function drawHero() {
+            const heroCanvasX = heroX - heroWidth / 2;
+            const heroCanvasY = heroY + canvasHeight - platformHeight - heroHeight;
+            
+            // Dibujar la imagen del jugador (más estilizada - 80x100)
+            if (playerImage.complete && playerImage.naturalWidth > 0) {
+                ctx.drawImage(playerImage, heroCanvasX, heroCanvasY, heroWidth, heroHeight);
+            } else {
+                // Fallback si la imagen no está cargada - dibujar un personaje simple
+                ctx.fillStyle = "#3498db";
+                ctx.beginPath();
+                ctx.arc(heroCanvasX + heroWidth/2, heroCanvasY + heroHeight/3, heroWidth/4, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = "#2980b9";
+                ctx.fillRect(heroCanvasX + heroWidth/4, heroCanvasY + heroHeight/2.5, heroWidth/2, heroHeight/2);
+                
+                ctx.fillStyle = "#34495e";
+                ctx.fillRect(heroCanvasX + heroWidth/4, heroCanvasY + heroHeight/2.5, heroWidth/2, heroHeight/10);
+                
+                // Piernas
+                ctx.fillStyle = "#2980b9";
+                ctx.fillRect(heroCanvasX + heroWidth/3, heroCanvasY + heroHeight/1.5, heroWidth/6, heroHeight/3);
+                ctx.fillRect(heroCanvasX + heroWidth/2, heroCanvasY + heroHeight/1.5, heroWidth/6, heroHeight/3);
+            }
+        }
+
+        // Dibujar palos
+        function drawSticks() {
+            sticks.forEach((stick) => {
+                ctx.save();
+
+                // Mover el punto de anclaje al inicio del palo y rotar
+                ctx.translate(stick.x, canvasHeight - platformHeight);
+                ctx.rotate((Math.PI / 180) * stick.rotation);
+
+                // Dibujar palo
+                ctx.beginPath();
+                ctx.lineWidth = 6;
+                ctx.lineCap = "round";
+                ctx.moveTo(0, 0);
+                ctx.lineTo(0, -stick.length);
+                ctx.strokeStyle = "#5D4037";
+                ctx.stroke();
+
+                ctx.restore();
+            });
+        }
+
+        // Dibujar fondo
+        function drawBackground() {
+            // Dibujar cielo
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvasHeight);
+            gradient.addColorStop(0, "#BBD691");
+            gradient.addColorStop(1, "#FEF1E1");
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+            // Dibujar colinas
+            drawHill(hill1BaseHeight, hill1Amplitude, hill1Stretch, "#95C629");
+            drawHill(hill2BaseHeight, hill2Amplitude, hill2Stretch, "#659F1C");
+
+            // Dibujar árboles
+            trees.forEach((tree) => drawTree(tree.x, tree.color));
+        }
+
+        // Dibujar colina
+        function drawHill(baseHeight, amplitude, stretch, color) {
+            ctx.beginPath();
+            ctx.moveTo(0, canvasHeight);
+            ctx.lineTo(0, getHillY(0, baseHeight, amplitude, stretch));
+            for (let i = 0; i < canvasWidth; i++) {
+                ctx.lineTo(i, getHillY(i, baseHeight, amplitude, stretch));
+            }
+            ctx.lineTo(canvasWidth, canvasHeight);
+            ctx.fillStyle = color;
+            ctx.fill();
+        }
+
+        // Dibujar árbol
+        function drawTree(x, color) {
+            ctx.save();
+            ctx.translate(
+                (-sceneOffset * backgroundSpeedMultiplier + x) * hill1Stretch,
+                getTreeY(x, hill1BaseHeight, hill1Amplitude)
+            );
+
+            const treeTrunkHeight = 5;
+            const treeTrunkWidth = 2;
+            const treeCrownHeight = 25;
+            const treeCrownWidth = 10;
+
+            // Dibujar tronco
+            ctx.fillStyle = "#7D833C";
+            ctx.fillRect(
+                -treeTrunkWidth / 2,
+                -treeTrunkHeight,
+                treeTrunkWidth,
+                treeTrunkHeight
+            );
+
+            // Dibujar copa
+            ctx.beginPath();
+            ctx.moveTo(-treeCrownWidth / 2, -treeTrunkHeight);
+            ctx.lineTo(0, -(treeTrunkHeight + treeCrownHeight));
+            ctx.lineTo(treeCrownWidth / 2, -treeTrunkHeight);
+            ctx.fillStyle = color;
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        // Obtener posición Y de la colina
+        function getHillY(windowX, baseHeight, amplitude, stretch) {
+            const sineBaseY = canvasHeight - baseHeight;
+            return (
+                Math.sinus((sceneOffset * backgroundSpeedMultiplier + windowX) * stretch) *
+                amplitude +
+                sineBaseY
+            );
+        }
+
+        // Obtener posición Y del árbol
+        function getTreeY(x, baseHeight, amplitude) {
+            const sineBaseY = canvasHeight - baseHeight;
+            return Math.sinus(x) * amplitude + sineBaseY;
+        }
+    </script>
+</body>
+</html>

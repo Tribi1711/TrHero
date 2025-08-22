@@ -1,0 +1,22 @@
+{
+  "name": "TrHero",
+  "short_name": "TrHero",
+  "description": "Divertido juego de plataformas TrHero",
+  "start_url": "/",
+  "display": "fullscreen",
+  "background_color": "#6ab04c",
+  "theme_color": "#6ab04c",
+  "orientation": "landscape",
+  "icons": [
+    {
+      "src": "assets/logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
