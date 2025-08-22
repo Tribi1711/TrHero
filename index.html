@@ -270,15 +270,12 @@
         let sticks = [];
         let trees = [];
         let score = 0;
+        let justRestarted = false; // Bandera para controlar reinicios
 
         // Cargar imagen del jugador
         let playerImage = new Image();
         playerImage.src = 'assets/player.png'; // Ruta a la imagen del jugador
-        playerImage.onload = function() {
-            // Una vez cargada la imagen, inicializar el juego
-            initGame();
-        };
-
+        
         // Configuración
         const platformHeight = 100;
         const heroDistanceFromEdge = 10;
@@ -322,46 +319,6 @@
             
             // Configurar el evento de redimensionamiento
             window.addEventListener("resize", resizeGame);
-            
-            // Configurar PWA
-            setupPWA();
-        }
-
-        // Configurar funcionalidad PWA
-        function setupPWA() {
-            // Detectar si el navegador soporta Service Worker
-            if ('serviceWorker' in navigator) {
-                window.addEventListener('load', function() {
-                    navigator.serviceWorker.register('sw.js')
-                    .then(function(registration) {
-                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
-                    })
-                    .catch(function(error) {
-                        console.log('ServiceWorker registration failed: ', error);
-                    });
-                });
-            }
-
-            // Detectar si la app se puede instalar
-            let deferredPrompt;
-            window.addEventListener('beforeinstallprompt', (e) => {
-                e.preventDefault();
-                deferredPrompt = e;
-                installButton.style.display = 'block';
-                
-                installButton.addEventListener('click', (e) => {
-                    installButton.style.display = 'none';
-                    deferredPrompt.prompt();
-                    deferredPrompt.userChoice.then((choiceResult) => {
-                        if (choiceResult.outcome === 'accepted') {
-                            console.log('User accepted the install prompt');
-                        } else {
-                            console.log('User dismissed the install prompt');
-                        }
-                        deferredPrompt = null;
-                    });
-                });
-            });
         }
 
         // Ajustar el tamaño del juego según la pantalla
@@ -374,9 +331,7 @@
             canvas.height = canvasHeight;
             
             // Redibujar el juego
-            if (phase !== "waiting") {
-                draw();
-            }
+            draw();
         }
 
         // Reiniciar variables del juego
@@ -385,6 +340,7 @@
             lastTimestamp = undefined;
             sceneOffset = 0;
             score = 0;
+            justRestarted = true; // Marcamos que acabamos de reiniciar
 
             introductionElement.style.opacity = 1;
             perfectElement.style.opacity = 0;
@@ -406,6 +362,9 @@
             heroY = 0;
 
             draw();
+            
+            // Desactivamos la bandera después de un breve tiempo
+            setTimeout(() => { justRestarted = false; }, 300);
         }
 
         // Generar árboles
@@ -454,7 +413,7 @@
 
         // Iniciar estiramiento al hacer clic
         window.addEventListener("mousedown", function (event) {
-            if (phase == "waiting") {
+            if (phase == "waiting" && !justRestarted) {
                 lastTimestamp = undefined;
                 introductionElement.style.opacity = 0;
                 phase = "stretching";
@@ -473,7 +432,7 @@
 
         // También soporte para dispositivos táctiles
         window.addEventListener("touchstart", function (event) {
-            if (phase == "waiting") {
+            if (phase == "waiting" && !justRestarted) {
                 lastTimestamp = undefined;
                 introductionElement.style.opacity = 0;
                 phase = "stretching";
@@ -504,16 +463,14 @@
 
         // Botón de reinicio para dispositivos táctiles
         restartButton.addEventListener("touchstart", function (event) {
-            event.preventDefault();
+            event.stopPropagation(); // Evita que el evento se propague
             resetGame();
-            restartButton.style.display = "none";
         }, { passive: false });
 
         // Botón de reinicio para ratón
         restartButton.addEventListener("click", function (event) {
-            event.preventDefault();
+            event.stopPropagation(); // Evita que el evento se propague
             resetGame();
-            restartButton.style.display = "none";
         });
 
         // Iniciar bucle de animación
@@ -817,6 +774,16 @@
         function getTreeY(x, baseHeight, amplitude) {
             const sineBaseY = canvasHeight - baseHeight;
             return Math.sinus(x) * amplitude + sineBaseY;
+        }
+
+        // Iniciar el juego cuando la imagen esté cargada
+        playerImage.onload = function() {
+            initGame();
+        };
+        
+        // Si la imagen ya está cargada, iniciar el juego inmediatamente
+        if (playerImage.complete) {
+            initGame();
         }
     </script>
 </body>
